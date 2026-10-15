@@ -10,6 +10,10 @@ Android aplikácia (Kotlin, Jetpack Compose). Kvíz o európskych futbalových k
 - Najlepšie skóre sa ukladá v telefóne.
 
 ## Ako získať APK
+Priamy odkaz na najnovšiu verziu (otvor v mobile):
+https://github.com/ivanchochula-oss/clauder/releases/latest/download/FutbalovyKviz.apk
+
+Alebo cez Actions:
 1. GitHub → záložka **Actions** → workflow **Futbalový kvíz – Android build**.
 2. Otvor posledný úspešný beh → sekcia **Artifacts** → stiahni `futbal-kviz-apk`.
 3. Rozbaľ ZIP, `app-debug.apk` pošli do telefónu a nainštaluj
