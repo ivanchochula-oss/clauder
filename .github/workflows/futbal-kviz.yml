@@ -7,6 +7,9 @@ on:
       - ".github/workflows/futbal-kviz.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,3 +31,14 @@ jobs:
         with:
           name: futbal-kviz-apk
           path: futbal-kviz/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publikovať APK ako Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk FutbalovyKviz.apk
+          gh release create "futbal-kviz-v${{ github.run_number }}" FutbalovyKviz.apk \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "Futbalový kvíz ${{ github.run_number }}" \
+            --notes "APK na inštaláciu do Android telefónu." \
+            --latest
