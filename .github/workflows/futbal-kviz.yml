@@ -23,6 +23,8 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
+      - name: Stiahnuť logá klubov
+        run: python3 scripts/download_logos.py
       - name: Testy
         run: ./gradlew --no-daemon testDebugUnitTest
       - name: Build APK

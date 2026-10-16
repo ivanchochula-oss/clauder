@@ -7,7 +7,14 @@ Android aplikácia (Kotlin, Jetpack Compose). Kvíz o európskych futbalových k
 - Jedno kolo = 10 náhodných otázok. Poradie otázok aj odpovedí sa mieša.
 - 15 sekúnd na otázku. Body: 10 + zostávajúce sekundy.
 - Po odpovedi sa zobrazí vysvetlenie.
-- Najlepšie skóre sa ukladá v telefóne.
+- Najlepšie skóre sa ukladá v telefóne (zvlášť pre každý režim).
+- Režim **Hádaj klub podľa loga**: 31 klubov, logo + 4 možnosti.
+
+## Logá klubov
+Logá sa do repozitára neukladajú. Pri builde ich stiahne z Wikipédie
+`scripts/download_logos.py` do `app/src/main/assets/logos/`.
+Pri lokálnom builde ho spusti ručne: `python3 scripts/download_logos.py`.
+Logá sú ochranné známky klubov. Aplikácia je určená na súkromné a vzdelávacie použitie.
 
 ## Ako získať APK
 Priamy odkaz na najnovšiu verziu (otvor v mobile):

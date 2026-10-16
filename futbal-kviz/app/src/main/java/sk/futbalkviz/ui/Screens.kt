@@ -3,6 +3,11 @@ package sk.futbalkviz.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +30,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import sk.futbalkviz.GameMode
 import sk.futbalkviz.QUESTIONS_PER_ROUND
 import sk.futbalkviz.QuizState
 import sk.futbalkviz.SECONDS_PER_QUESTION
@@ -39,7 +48,7 @@ import sk.futbalkviz.SECONDS_PER_QUESTION
 private val ButtonShape = RoundedCornerShape(14.dp)
 
 @Composable
-fun HomeScreen(state: QuizState.Home, onStart: () -> Unit, modifier: Modifier = Modifier) {
+fun HomeScreen(state: QuizState.Home, onStart: (GameMode) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,20 +73,33 @@ fun HomeScreen(state: QuizState.Home, onStart: () -> Unit, modifier: Modifier = 
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
         )
-        Spacer(Modifier.height(24.dp))
-        Text(
-            "Najlepšie skóre: ${state.bestScore}",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-        )
         Spacer(Modifier.height(32.dp))
         Button(
-            onClick = onStart,
+            onClick = { onStart(GameMode.General) },
             shape = ButtonShape,
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {
-            Text("Hrať", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("Všeobecný kvíz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
+        Text(
+            "Rekord: ${state.bestScore}",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        Spacer(Modifier.height(20.dp))
+        Button(
+            onClick = { onStart(GameMode.Logos) },
+            enabled = state.logosAvailable,
+            shape = ButtonShape,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+        ) {
+            Text("Hádaj klub podľa loga", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+        Text(
+            if (state.logosAvailable) "Rekord: ${state.bestLogoScore}" else "Logá nie sú v tejto verzii k dispozícii.",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 6.dp),
+        )
     }
 }
 
@@ -117,6 +139,10 @@ fun QuestionScreen(
             Text("${state.secondsLeft} s", fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.height(24.dp))
+        q.logoKey?.let { key ->
+            ClubLogo(key, Modifier.align(Alignment.CenterHorizontally))
+            Spacer(Modifier.height(20.dp))
+        }
         Text(
             q.text,
             style = MaterialTheme.typography.headlineSmall,
@@ -170,6 +196,29 @@ fun QuestionScreen(
                     Text(if (state.isLast) "Výsledky" else "Ďalšia otázka", fontWeight = FontWeight.Bold)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ClubLogo(key: String, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val bitmap = remember(key) {
+        runCatching {
+            context.assets.open("logos/$key.png").use { BitmapFactory.decodeStream(it) }?.asImageBitmap()
+        }.getOrNull()
+    }
+    Box(
+        modifier = modifier
+            .size(200.dp)
+            .background(Chalk, RoundedCornerShape(24.dp))
+            .padding(20.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (bitmap != null) {
+            Image(bitmap = bitmap, contentDescription = "Logo klubu", modifier = Modifier.fillMaxSize())
+        } else {
+            Text("Logo sa nenačítalo", color = PitchDark, textAlign = TextAlign.Center)
         }
     }
 }

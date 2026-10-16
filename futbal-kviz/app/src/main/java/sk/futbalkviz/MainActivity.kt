@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     when (val s = state) {
                         is QuizState.Home -> HomeScreen(s, onStart = vm::start, modifier = m)
                         is QuizState.Playing -> QuestionScreen(s, onAnswer = vm::answer, onNext = vm::next, modifier = m)
-                        is QuizState.Finished -> ResultScreen(s, onPlayAgain = vm::start, onHome = vm::goHome, modifier = m)
+                        is QuizState.Finished -> ResultScreen(s, onPlayAgain = vm::playAgain, onHome = vm::goHome, modifier = m)
                     }
                 }
             }
