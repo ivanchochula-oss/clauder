@@ -1,0 +1,46 @@
+name: Futbalový kvíz – Android build
+
+on:
+  push:
+    paths:
+      - "futbal-kviz/**"
+      - ".github/workflows/futbal-kviz.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: futbal-kviz
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Stiahnuť logá klubov
+        run: python3 scripts/download_logos.py
+      - name: Testy
+        run: ./gradlew --no-daemon testDebugUnitTest
+      - name: Build APK
+        run: ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: futbal-kviz-apk
+          path: futbal-kviz/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publikovať APK ako Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk FutbalovyKviz.apk
+          gh release create "futbal-kviz-v${{ github.run_number }}" FutbalovyKviz.apk \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "Futbalový kvíz ${{ github.run_number }}" \
+            --notes "APK na inštaláciu do Android telefónu." \
+            --latest

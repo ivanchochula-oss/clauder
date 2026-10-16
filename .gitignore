@@ -1,2 +1,5 @@
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Built Android packages
+*.apk
